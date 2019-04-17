@@ -47,7 +47,7 @@ $("#myslider1").slider({
     },
 
     change: function (event, ui) {
-        let vals = $("#myslider1").slider("option", "values");
+        let vals = $("#slider1").slider("option", "values");
         console.log(vals[0], vals[1]);
 
         // データの再セット
@@ -67,7 +67,7 @@ $("#myslider1").slider({
 });
 
 // 全体グラフの生成
-var ctx = document.getElementById("myChart2").getContext("2d");
+var ctx = document.getElementById("chart2").getContext("2d");
 var chart_obj2 = new Chart(ctx, {
     type: "line",
     data: config,
@@ -118,7 +118,7 @@ var config2 = {
 };
 
 // 詳細グラフの生成
-var ctx = document.getElementById("myChart1").getContext("2d");
+var ctx = document.getElementById("chart1").getContext("2d");
 var chart_obj1 = new Chart(ctx, {
     type: "line",
     data: config2,

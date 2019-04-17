@@ -14,9 +14,57 @@ $password = '';
 try {
     $db = new PDO($dsn, $user, $password);
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    $stmt = $db->prepare("select order_number,b.course_id,a.title,a.description,b.description bdescription,b.sub_description bsub_description, a.level,a.popularity,a.length,a.time,a.calorie,a.start_lat,a.start_long,a.goal_lat,a.goal_long,b.picture_title,b.picture_filename,b.wait_lat,b.wait_long,b.description detaildescription,genre_id,b.route_flag,b.url from course a, course_route b where a.id=b.course_id and b.course_id=:course_id order by order_number");
-
-    $stmt->bindParam(':course_id', $course_id, PDO::PARAM_INT);
+    $stmt = $db->prepare("
+        select
+            t.detected_node
+            , t.major
+            , t.minor
+            , t.sensors_key
+            , t.sensors_value
+            , t.latitude
+            , t.longitude
+            , max(t.create_time)
+            , m.description
+            , m.sub_description
+            , m.picture
+            , m.url 
+        from
+            skeed_oz t 
+            left join skeed_node m 
+            on t.detected_node = m.node 
+        where
+            t.sensors_value <> '' 
+            and t.latitude <> '' 
+        group by
+            t.detected_node
+            , t.major
+            , t.minor 
+        union 
+        select
+            t.detected_node
+            , t.major
+            , t.minor
+            , t.sensors_key
+            , t.sensors_value
+            , 34.2053952 as latitude
+            , 134.6810688 as longitude
+            , max(t.create_time)
+            , m.description
+            , m.sub_description
+            , m.picture
+            , m.url 
+        from
+            skeed_oz t 
+            left join skeed_node m 
+            on t.detected_node = m.node 
+        where
+            t.detected_node = 'R3A-0000000031C7F85D' 
+        group by
+            t.detected_node
+            , t.major
+            , t.minor"
+        );
+    // $stmt->bindParam(':course_id', $course_id, PDO::PARAM_INT);
     $stmt->execute();
     $data = array();
     $count = $stmt->rowCount();
@@ -79,7 +127,7 @@ try {
 
     <div class="container-fluid">
         <div class="row">
-            <!-- <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -90,47 +138,41 @@ try {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">
-                                <span data-feather="file"></span>
+                                <span data-feather="bar-chart-2"></span>
                                 棒グラフ
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">
-                                <span data-feather="shopping-cart"></span>
+                                <span data-feather="activity"></span>
                                 折れ線グラフ
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="users"></span>
-                                円グラフ
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="bar-chart-2"></span>
-                                ドーナツ
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <span data-feather="layers"></span>
-                                レーダー
                             </a>
                         </li>
                     </ul>
 
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>データ集計</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
+                        <span>対象データ</span>
+                        <!-- <a class="d-flex align-items-center text-muted" href="#">
                             <span data-feather="plus-circle"></span>
-                        </a>
+                        </a> -->
                     </h6>
                     <ul class="nav flex-column mb-2">
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span data-feather="file-text"></span>
+                                当月
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file-text"></span>
                                 前月
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file-text"></span>
+                                当年
                             </a>
                         </li>
                         <li class="nav-item">
@@ -141,11 +183,11 @@ try {
                         </li>
                     </ul>
                 </div>
-            </nav> -->
+            </nav>
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">node</h1>
+                    <h1 class="h2">センサー MAP</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
 
                         <div class="btn-group mr-2">
@@ -176,13 +218,13 @@ try {
                     <div id="map" class="map col-sm-10">
                               
                     <div class="col-sm-9">
-                        <canvas id="myChart1" height="110"></canvas>
+                        <canvas id="chart1" height="110"></canvas>
                     </div>
                     <div class="col-sm-9">
-                        <canvas id="myChart2" height="40"></canvas>
+                        <canvas id="chart2" height="40"></canvas>
                     </div>
                     <div class="col-sm-9">
-                        <div id="myslider1"></div>
+                        <div id="slider1"></div>
                     </div>
                 </div>
 
@@ -276,7 +318,7 @@ try {
         ];
     </script>
 
-    <script src="js/mapCode.js"></script>
+    <script src="js/srMapCode.js"></script>
 
 </body>
 
