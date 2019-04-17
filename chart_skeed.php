@@ -10,6 +10,24 @@ $dsn = 'mysql:host=localhost;dbname=fwgc1945_densin;charset=utf8';
 $user = 'root';
 $password = '';
 
+//googleMap用データの取得
+try {
+    $db = new PDO($dsn, $user, $password);
+    $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $stmt = $db->prepare("select order_number,b.course_id,a.title,a.description,b.description bdescription,b.sub_description bsub_description, a.level,a.popularity,a.length,a.time,a.calorie,a.start_lat,a.start_long,a.goal_lat,a.goal_long,b.picture_title,b.picture_filename,b.wait_lat,b.wait_long,b.description detaildescription,genre_id,b.route_flag,b.url from course a, course_route b where a.id=b.course_id and b.course_id=:course_id order by order_number");
+
+    $stmt->bindParam(':course_id', $course_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $data = array();
+    $count = $stmt->rowCount();
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $data[] = $row;
+    }
+} catch (PDOException $e) {
+    die('エラー:' . $e->getMesssage());
+}
+
+//chart用データの取得
 try {
     $db = new PDO($dsn, $user, $password);
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
@@ -228,6 +246,34 @@ try {
 
     <script>
         feather.replace()
+    </script>
+
+    <script>
+        // 経由地点を設定
+        var latlang = [
+            <?php
+            $count = count($data);
+            $i = 0;
+            foreach ($data as $row) {
+                $i++;
+                echo '{';
+                echo 'order_number:' . $row['order_number'] . ',';
+                echo 'description:"' . $row['detaildescription'] . '",';
+                echo 'sub_description:"' . $row['bsub_description'] . '",';
+                echo 'picture:"' . $row['picture_filename'] . '",';
+                echo 'genre_id:"' . $row['genre_id'] . '",';
+                echo 'route_flag:' . $row['route_flag'] . ',';
+                echo 'url:"' . $row['url'] . '",';
+                echo 'lat:"' . $row['wait_lat'] . '",';
+                echo 'lang:"' . $row['wait_long'] . '"';
+                if ($i == $count) {
+                    echo '}';
+                } else {
+                    echo '},';
+                }
+            }
+            ?>
+        ];
     </script>
 
     <script src="js/mapCode.js"></script>
