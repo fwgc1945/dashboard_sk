@@ -131,17 +131,16 @@ try {
                     <div class="btn-toolbar mb-2 mb-md-0">
 
                         <div class="btn-group mr-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">棒グラフ</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">折れ線</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">円グラフ</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">ドーナツ</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">レーダー</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">　活動タグ MAP　</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">　活動タグ 一覧　</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">　センサー MAP　</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">　センサー 一覧　</button>
                         </div>
 
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                        <!-- <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
                             <span data-feather="calendar"></span>
                             今週
-                        </button>
+                        </button> -->
                     </div>
                 </div>
 
