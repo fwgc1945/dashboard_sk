@@ -154,7 +154,9 @@ try {
                         }
                         ?> -->
                     </ul>                    
-                                    
+
+                    <div id="map" class="map col-sm-10">
+                              
                     <div class="col-sm-9">
                         <canvas id="myChart1" height="110"></canvas>
                     </div>
@@ -222,11 +224,13 @@ try {
         ?>
     </script>
 
-    <script src="js/myChart1.js"></script>
+    <script src="js/srChart1.js"></script>
 
     <script>
         feather.replace()
     </script>
+
+    <script src="js/mapCode.js"></script>
 
 </body>
 
